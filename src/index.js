@@ -77,12 +77,16 @@ class Game extends React.Component {
       history: [{
         squares: Array(9).fill(null)
       }],
+      stepNumber: 0,
       xIsNext: true,
     }
   }
 
   handleClick(i) {
-    const history = this.state.history
+    //This following line ensures that if we “go back in time” and then make a
+    //new move from that point, we throw away all the “future” history
+    //that would now become incorrect.
+    const history = this.state.history.slice(0, this.state.stepNumber + 1)
     const current = history[history.length-1]
     const squares = current.squares.slice()//slice() to make a copy of squares[] keeping things immutable
     if (calculateWinner(squares) || squares[i]) { //If something besides null is returned OR if the square clicked on already contains an item...
@@ -94,14 +98,35 @@ class Game extends React.Component {
       history: history.concat([{
         squares:squares,
       }]),
+      stepNumber: history.length,
       xIsNext: !this.state.xIsNext,
+    })
+  }
+
+  jumpTo(step) {
+    this.setState({
+      stepNumber: step,
+      xIsNext: (step % 2) === 0,
     })
   }
 
   render() {
     const history = this.state.history //make a copy of state.history[]
-    const current = history[history.length - 1] //the last item in the history[] array
+    //const current = history[history.length - 1] //the last item in the history[] array
+    const current = history[this.state.stepNumber]
     const winner = calculateWinner(current.squares)
+
+    const moves = history.map((step, move) => {
+      const desc = move ?
+        'Go to move #' + move :
+        'Go to Start of Game'
+      return(
+        <li key={move}>
+          <button onClick={() => this.jumpTo(move)}>{desc}</button>
+        </li>
+      )
+
+    })
 
     let status
     if (winner) {
@@ -119,7 +144,7 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{ status }</div>
-          <ol>{/* TODO */}</ol>
+          <ol>{ moves }</ol>
         </div>
       </div>
     );
