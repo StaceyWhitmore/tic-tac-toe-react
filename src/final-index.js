@@ -12,6 +12,7 @@ ReactDOM.render(
   document.getElementById('root')
 );
 
+/*
 function calculateWinner(squares) {
   const lines = [
     [0, 1, 2],
@@ -31,3 +32,4 @@ function calculateWinner(squares) {
   }
 return null //If loop runs all the way throguh squares[] and statement is never true then there is now winner yet. Return null
 }//close calculateWinner( )
+*/
