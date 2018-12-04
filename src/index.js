@@ -37,13 +37,7 @@ function Square(props) {
 //notice <Square> now recieves value from <Board> as a prop
 //<Square> can now access 'value' by using 'this.props.value'
 class Board extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      squares: Array(9).fill(null),
-      xIsNext: true
-    }
-  }
+
 
   handleClick(i) {
     //.slice makes a copy of all of the values from the state object's 'squares' and places them into an array.
@@ -58,8 +52,8 @@ class Board extends React.Component {
     })
   }
   renderSquare(i) {
-    return <Square value={this.state.squares[i]}
-                   onClick={() => this.handleClick(i)}
+    return <Square value={this.props.squares[i]}
+                   onClick={() => this.props.onClick(i)}
      />;
   }
 
@@ -97,6 +91,15 @@ class Board extends React.Component {
 }//close <Board>
 
 class Game extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      history: [{
+        squares: Array(9).fill(null)
+      }],
+      xIsNext: true,
+    }
+  }
   render() {
     return (
       <div className="game">
