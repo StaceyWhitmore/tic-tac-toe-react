@@ -38,19 +38,6 @@ function Square(props) {
 //<Square> can now access 'value' by using 'this.props.value'
 class Board extends React.Component {
 
-
-  handleClick(i) {
-    //.slice makes a copy of all of the values from the state object's 'squares' and places them into an array.
-    const squares = this.state.squares.slice()//slice() to make a copy of squares[] keeping things immutable
-    if (calculateWinner(squares) || squares[i]) { //If something besides null is returned OR if the square clicked on already contains an item...
-      return; //then return early b/c either somebody has already won the game or the square is already filled.
-    }
-    squares[i] = this.state.xIsNext ? 'X' : 'O'
-    this.setState({
-      squares: squares,
-      xIsNext: !this.state.xIsNext
-    })
-  }
   renderSquare(i) {
     return (
       <Square
@@ -61,18 +48,8 @@ class Board extends React.Component {
   }
 
   render() {
-    //const status = 'Next Player ' +   (this.state.xIsNext ? 'X' : 'O')
-    const winner = calculateWinner(this.state.squares)
-    let status
-    if (winner) {
-      status = 'Winner: ' + winner
-    } else {
-      status = 'Next Player ' + (this.state.xIsNext ? 'X' : 'O')
-    }
-
     return (
       <div>
-        <div className="status">{status}</div>
         <div className="board-row">
           {this.renderSquare(0)}
           {this.renderSquare(1)}
@@ -103,14 +80,45 @@ class Game extends React.Component {
       xIsNext: true,
     }
   }
+
+  handleClick(i) {
+    const history = this.state.history
+    const current = history[history.length-1]
+    const squares = current.squares.slice()//slice() to make a copy of squares[] keeping things immutable
+    if (calculateWinner(squares) || squares[i]) { //If something besides null is returned OR if the square clicked on already contains an item...
+      return; //then return early b/c either somebody has already won the game or the square is already filled.
+    }
+    squares[i] = this.state.xIsNext ? 'X' : 'O'
+    //unlike Array.push() .concat() doesn't mutuate the array
+    this.setState({
+      history: history.concat([{
+        squares:squares,
+      }]),
+      xIsNext: !this.state.xIsNext,
+    })
+  }
+
   render() {
+    const history = this.state.history //make a copy of state.history[]
+    const current = history[history.length - 1] //the last item in the history[] array
+    const winner = calculateWinner(current.squares)
+
+    let status
+    if (winner) {
+      status = 'Winner: ' + winner
+    } else {
+      status = 'Next Player ' + (this.state.xIsNext ? 'X' : 'O')
+    }
     return (
       <div className="game">
         <div className="game-board">
-          <Board />
+          <Board
+          squares={current.squares}
+          onClick={(i) => this.handleClick(i)}
+          />
         </div>
         <div className="game-info">
-          <div>{/* status */}</div>
+          <div>{ status }</div>
           <ol>{/* TODO */}</ol>
         </div>
       </div>
